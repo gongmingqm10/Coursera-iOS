@@ -2,7 +2,15 @@
 
 import UIKit
 
-let image = UIImage(named: "London")
+let image = UIImage(named: "London")!
 
-// Process the image!
+let imageFilters = ImageFilters(image: image)
+
+let bwNormalImage = imageFilters.apply(BWFilter(type: BWType.Normal))
+
+let bwPopularImage = imageFilters.apply(BWFilter(type: BWType.Popular))
+
+let bwBinaryImage = imageFilters.apply(BWFilter(type: BWType.Binary))
+
+	
 
