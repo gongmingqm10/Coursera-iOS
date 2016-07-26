@@ -1,5 +1,5 @@
 import Foundation
 
-public protocol Filter {
+protocol Filter {
     func apply(inout rgbaImage: RGBAImage)
 }

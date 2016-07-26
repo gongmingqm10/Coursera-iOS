@@ -7,7 +7,7 @@ public class ImageFilters {
         self.originalImage = RGBAImage(image: image)!
     }
     
-    public func apply(filters: Filter...) -> UIImage {
+    func apply(filters: Filter...) -> UIImage {
         var filterImage = originalImage
         for filter in filters {
             filter.apply(&filterImage)

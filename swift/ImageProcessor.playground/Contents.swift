@@ -1,16 +1,12 @@
 //: Playground - noun: a place where people can play
-
+import XCPlayground
 import UIKit
 
-let image = UIImage(named: "London")!
+XCPlaygroundPage.currentPage.liveView = PlaygroundView()
 
-let imageFilters = ImageFilters(image: image)
 
-let bwNormalImage = imageFilters.apply(BWFilter(type: BWType.Normal))
 
-let bwPopularImage = imageFilters.apply(BWFilter(type: BWType.Popular))
 
-let bwBinaryImage = imageFilters.apply(BWFilter(type: BWType.Binary))
 
-	
+
 
