@@ -7,9 +7,10 @@ public class ImageFilters {
         self.originalImage = RGBAImage(image: image)!
     }
     
-    func apply(filters: Filter...) -> UIImage {
+    func apply(intensity: Double, filters: [Filter]) -> UIImage {
         var filterImage = originalImage
         for filter in filters {
+            filter.intensity = intensity
             filter.apply(&filterImage)
         }
         return filterImage.toUIImage()!

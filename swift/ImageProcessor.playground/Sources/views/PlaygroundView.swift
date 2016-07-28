@@ -4,17 +4,20 @@ public class PlaygroundView: UIView {
     
     let screenWidth: CGFloat = 320
     let screenHeight: CGFloat = 600
-    let sliderDefault: Float = 75
+    let sliderDefault: Float = 5.0
+    let sliderMaxValue: Float = 10.0
     
     var imageView: UIImageView?
     var intensitySlider: UISlider?
     var originalImage: UIImage?
     var imageFilters: ImageFilters?
+    var currentFilters: [Filter]?
     
     enum FilterType: Int {
         case NONE = 0
         case BW = 1
         case LAYER = 2
+        case MULTIPLE = 3
     }
     
     required public init?(coder aDecoder: NSCoder) {
@@ -25,24 +28,35 @@ public class PlaygroundView: UIView {
         super.init(frame: CGRectMake(0, 0, screenWidth, screenHeight))
         initFilters()
         initSubView()
+        resetStatus()
     }
     
-    func applyFilter(sender: UIButton) {
-        var filteredImage: UIImage?
+    func changeFilter(sender: UIButton) {
+        intensitySlider?.hidden = false
         switch sender.tag {
         case FilterType.BW.rawValue:
-            filteredImage = imageFilters?.apply(BWFilter(intensity: sliderDefault))
+            currentFilters = [FilterFactory.createBWFilter()]
         case FilterType.LAYER.rawValue:
-            filteredImage = imageFilters?.apply(LayerFilter(intensity: sliderDefault))
+            currentFilters = [FilterFactory.createLayerFilter()]
+        case FilterType.MULTIPLE.rawValue:
+            currentFilters = [FilterFactory.createLayerFilter(), FilterFactory.createBWFilter()]
         default:
-            filteredImage = originalImage
-            break;
+            resetStatus()
         }
-        imageView?.image = filteredImage!
+        intensitySlider?.setValue(sliderDefault, animated: false)
+        changeIntensity(intensitySlider!)
     }
     
     func changeIntensity(sender: UISlider) {
-        //TODO: update the filter effects
+        let filterIntensity = Double(sender.value / sliderMaxValue)
+        let filteredImage = imageFilters?.apply(filterIntensity, filters: currentFilters!)
+        imageView?.image = filteredImage
+    }
+    
+    private func resetStatus() {
+        imageView?.image = originalImage
+        currentFilters = []
+        intensitySlider?.hidden = true
     }
     
     private func initFilters() {
@@ -68,7 +82,7 @@ public class PlaygroundView: UIView {
         let sliderHeight: CGFloat = 240
         intensitySlider = UISlider(frame: CGRectMake(screenWidth - sliderHeight / 2 - 15, screenHeight / 2, sliderHeight, 10))
         intensitySlider?.minimumValue = 0.0
-        intensitySlider?.maximumValue = 100.0
+        intensitySlider?.maximumValue = sliderMaxValue
         intensitySlider?.continuous = false
         intensitySlider?.value = sliderDefault
         intensitySlider?.tintColor = UIColor.redColor()
@@ -86,7 +100,8 @@ public class PlaygroundView: UIView {
         
         buttonsView.addSubview(createButton("B&W", frame: CGRectMake(10, 0, 64, 32), type: .BW))
         buttonsView.addSubview(createButton("Layer", frame: CGRectMake(80, 0, 64, 32), type: .LAYER))
-        buttonsView.addSubview(createButton("Reset", frame: CGRectMake(150, 0, 64, 32), type: .NONE))
+        buttonsView.addSubview(createButton("Multiple", frame: CGRectMake(150, 0, 64, 32), type: .MULTIPLE))
+        buttonsView.addSubview(createButton("Reset", frame: CGRectMake(220, 0, 64, 32), type: .NONE))
     }
     
     private func createButton(title: String, frame: CGRect, type: FilterType) -> UIButton {
@@ -94,7 +109,7 @@ public class PlaygroundView: UIView {
         filterButton.frame = frame
         filterButton.setTitle(title, forState: UIControlState.Normal)
         filterButton.addTarget(self,
-                           action: #selector(PlaygroundView.applyFilter(_:)),
+                           action: #selector(PlaygroundView.changeFilter(_:)),
                            forControlEvents: .TouchUpInside)
         filterButton.tag = type.rawValue
         return filterButton

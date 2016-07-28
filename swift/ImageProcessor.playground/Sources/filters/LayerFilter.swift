@@ -2,13 +2,7 @@ import Foundation
 
 public class LayerFilter: Filter {
     
-    let intensity: Float
-    
-    init(intensity: Float) {
-        self.intensity = intensity
-    }
-    
-    public func apply(inout rgbaImage: RGBAImage) {
+    override public func apply(inout rgbaImage: RGBAImage) {
         for y in 0..<rgbaImage.height {
             for x in 0..<rgbaImage.width {
                 let index = x + y * rgbaImage.width
@@ -35,6 +29,7 @@ public class LayerFilter: Filter {
         default:
             layerValue = 0
         }
-        return UInt8(layerValue)
+        layerValue += 64 * intensity!
+        return UInt8(min(255, max(0, layerValue)))
     }
 }
